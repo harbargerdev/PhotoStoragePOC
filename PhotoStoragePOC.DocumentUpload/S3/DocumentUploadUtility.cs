@@ -1,13 +1,7 @@
-﻿using Amazon.Runtime;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using PhotoStoragePOC.DocumentUpload.Entities;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhotoStoragePOC.DocumentUpload.S3
 {
