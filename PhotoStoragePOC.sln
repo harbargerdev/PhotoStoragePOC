@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoStoragePOC.Console", "PhotoStoragePOC.Console\PhotoStoragePOC.Console.csproj", "{4CE41719-E9A6-45B7-A887-453B4CAD761C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhotoStoragePOC.DocumentUpload", "PhotoStoragePOC.DocumentUpload\PhotoStoragePOC.DocumentUpload.csproj", "{02BED6C0-E2E3-44CD-B3B1-002DBDCE0CE3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{4CE41719-E9A6-45B7-A887-453B4CAD761C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CE41719-E9A6-45B7-A887-453B4CAD761C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CE41719-E9A6-45B7-A887-453B4CAD761C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02BED6C0-E2E3-44CD-B3B1-002DBDCE0CE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02BED6C0-E2E3-44CD-B3B1-002DBDCE0CE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02BED6C0-E2E3-44CD-B3B1-002DBDCE0CE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02BED6C0-E2E3-44CD-B3B1-002DBDCE0CE3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
