@@ -39,6 +39,9 @@
     <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.S3.3.3.18.2\lib\net45\AWSSDK.S3.dll</HintPath>
     </Reference>
+    <Reference Include="AWSSDK.SecurityToken, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.SecurityToken.3.3.4.3\lib\net45\AWSSDK.SecurityToken.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -60,6 +63,7 @@
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.3.3.8\analyzers\dotnet\cs\AWSSDK.DynamoDBv2.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.18.2\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
+    <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.3.4.3\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DataAccessLayer\" />

@@ -63,5 +63,11 @@
     <Analyzer Include="..\packages\AWSSDK.IdentityManagement.3.3.6.3\analyzers\dotnet\cs\AWSSDK.IdentityManagement.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.3.4.3\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PhotoStoragePOC.DocumentUpload\PhotoStoragePOC.DocumentUpload.csproj">
+      <Project>{02bed6c0-e2e3-44cd-b3b1-002dbdce0ce3}</Project>
+      <Name>PhotoStoragePOC.DocumentUpload</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
