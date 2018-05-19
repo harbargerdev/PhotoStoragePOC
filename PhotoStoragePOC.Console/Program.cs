@@ -9,6 +9,9 @@ using Amazon.Runtime.CredentialManagement;
 using Amazon.IdentityManagement;
 using Amazon;
 using Amazon.IdentityManagement.Model;
+using PhotoStoragePOC.DocumentUpload.Entities;
+using PhotoStoragePOC.DocumentUpload.S3;
+using System.IO;
 
 namespace PhotoStoragePOC.ConsoleTests
 {
@@ -17,9 +20,35 @@ namespace PhotoStoragePOC.ConsoleTests
         public static void Main(string[] args)
         {
             WriteStartHeader();
-            CheckSerivceAccountAccess();
+            //CheckSerivceAccountAccess();
+            VerifyBucketUpload();
 
             Console.Read();
+        }
+
+        private static void VerifyBucketUpload()
+        {
+            Console.WriteLine("======================================================");
+            Console.WriteLine("| Testing S3 File Upload                             |");
+            Console.WriteLine("======================================================");
+
+            // Set some defaults
+            string defaultBucket = "photostoragepoc";
+            // AWSCredentials credentials = BuildCredentials();
+
+            // Create new utility instance
+            DocumentUploadUtility utility = new DocumentUploadUtility(defaultBucket, "", "");
+
+
+            // Build file stream
+            string fileName = "test" + DateTime.Now.ToFileTime().ToString() + ".txt";
+            FileStream stream = File.Create(fileName);
+            string testMessage = "This is a test message created " + DateTime.Now.ToFileTime().ToString();
+            byte[] bytes = Encoding.ASCII.GetBytes(testMessage);
+            stream.BeginWrite(Encoding.ASCII.GetBytes(testMessage), 0, Encoding.ASCII.GetByteCount(testMessage), null, null);
+
+            // Test file upload
+            utility.UploadDocumentToS3(stream, fileName, "testuser");
         }
 
         private static void WriteStartHeader()
@@ -30,43 +59,24 @@ namespace PhotoStoragePOC.ConsoleTests
             Console.WriteLine("\n");
         }
 
-        private static void CheckSerivceAccountAccess()
+        private static AWSCredentials BuildCredentials()
         {
-            Console.WriteLine("Starting test to validate service account access ...\n\n");
+            AWSCredentials credentials = null;
 
-            Console.WriteLine("Accessing the local configuration file ...\n\n");
-
-            // Get Credentials from configuration
             var options = new CredentialProfileOptions()
             {
                 AccessKey = "",
                 SecretKey = ""
             };
+
             CredentialProfile profile = new CredentialProfile("development", options);
             profile.Region = RegionEndpoint.USEast1;
             var sharedFile = new SharedCredentialsFile();
             sharedFile.RegisterProfile(profile);
 
-            AWSCredentials credentials;
             AWSCredentialsFactory.TryGetAWSCredentials(profile, sharedFile, out credentials);
-            try
-            {
-                using (var client = new AmazonIdentityManagementServiceClient(credentials))
-                {
-                    GetRoleRequest request = new GetRoleRequest();
-                    request.RoleName = "ListPutGetPhotoStoratePOCPolicy";
 
-                    var response = client.GetRole(request);
-
-                    Console.WriteLine("Got the following role from IAM: " + response.Role.RoleName.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error occured in method CheckSerivceAccountAccess()\n");
-                Console.WriteLine("Message: " + ex.Message);
-                Console.WriteLine("Stack Trace:\n" + ex.StackTrace);
-            }            
+            return credentials;
         }
     }
 }
