@@ -12,6 +12,8 @@ using Amazon.IdentityManagement.Model;
 using PhotoStoragePOC.DocumentUpload.Entities;
 using PhotoStoragePOC.DocumentUpload.S3;
 using System.IO;
+using PhotoStoragePOC.DocumentUpload.STS;
+using Amazon.SecurityToken.Model;
 
 namespace PhotoStoragePOC.ConsoleTests
 {
@@ -20,7 +22,7 @@ namespace PhotoStoragePOC.ConsoleTests
         public static void Main(string[] args)
         {
             WriteStartHeader();
-            //CheckSerivceAccountAccess();
+            TestStsUtility();
             VerifyBucketUpload();
 
             Console.Read();
@@ -28,9 +30,9 @@ namespace PhotoStoragePOC.ConsoleTests
 
         private static void VerifyBucketUpload()
         {
-            Console.WriteLine("======================================================");
-            Console.WriteLine("| Testing S3 File Upload                             |");
-            Console.WriteLine("======================================================");
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing S3 File Upload                               |");
+            Console.WriteLine("========================================================");
 
             // Set some defaults
             string defaultBucket = "photostoragepoc";
@@ -47,36 +49,51 @@ namespace PhotoStoragePOC.ConsoleTests
             byte[] bytes = Encoding.ASCII.GetBytes(testMessage);
             stream.BeginWrite(Encoding.ASCII.GetBytes(testMessage), 0, Encoding.ASCII.GetByteCount(testMessage), null, null);
 
-            // Test file upload
-            utility.UploadDocumentToS3(stream, fileName, "testuser");
+            try
+            {
+                // Test file upload
+                utility.UploadDocumentToS3(stream, fileName, "testuser");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+        }
+
+        private static void TestStsUtility()
+        {
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing StsUtility                                   |");
+            Console.WriteLine("========================================================");
+            Console.WriteLine("\n");
+
+            try
+            {
+                StsUtility stsUtility = new StsUtility();
+                Credentials credentials = stsUtility.GetSessionToken("", "");
+
+                Console.WriteLine("Temporary Credentials were located ...");
+                Console.WriteLine("Session Access Key: " + credentials.AccessKeyId);
+                Console.WriteLine("Session Token: " + credentials.SessionToken);
+                Console.WriteLine("Session expiration: " + credentials.Expiration);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+            
         }
 
         private static void WriteStartHeader()
         {
-            Console.WriteLine("======================================================");
-            Console.WriteLine("| PhotoStoragePoc Console Tests                      |");
-            Console.WriteLine("======================================================");
+            Console.WriteLine("==========================================================");
+            Console.WriteLine("| PhotoStoragePoc Console Tests                          |");
+            Console.WriteLine("==========================================================");
             Console.WriteLine("\n");
-        }
-
-        private static AWSCredentials BuildCredentials()
-        {
-            AWSCredentials credentials = null;
-
-            var options = new CredentialProfileOptions()
-            {
-                AccessKey = "",
-                SecretKey = ""
-            };
-
-            CredentialProfile profile = new CredentialProfile("development", options);
-            profile.Region = RegionEndpoint.USEast1;
-            var sharedFile = new SharedCredentialsFile();
-            sharedFile.RegisterProfile(profile);
-
-            AWSCredentialsFactory.TryGetAWSCredentials(profile, sharedFile, out credentials);
-
-            return credentials;
         }
     }
 }
