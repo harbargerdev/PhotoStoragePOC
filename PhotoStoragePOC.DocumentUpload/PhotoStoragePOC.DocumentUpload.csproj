@@ -56,6 +56,7 @@
     <Compile Include="Entities\UploadStatusEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="S3\DocumentUploadUtility.cs" />
+    <Compile Include="STS\StsUtility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
