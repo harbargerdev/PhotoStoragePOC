@@ -1,12 +1,11 @@
-﻿using Amazon.Runtime;
-using Amazon.S3;
+﻿using Amazon.S3;
 using Amazon.S3.Model;
 using PhotoStoragePOC.DocumentUpload.Entities;
 using System.IO;
-using Amazon.SecurityToken;
 using Amazon.SecurityToken.Model;
-using Amazon.Runtime.CredentialManagement;
 using Amazon;
+using PhotoStoragePOC.DocumentUpload.STS;
+using System;
 
 namespace PhotoStoragePOC.DocumentUpload.S3
 {
@@ -14,7 +13,6 @@ namespace PhotoStoragePOC.DocumentUpload.S3
     {
         private string AccessKey;
         private string SecretKey;
-        private string DefaultRegion;
         private string SessionToken;
         private string BucketName;
 
@@ -22,6 +20,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
         
         public DocumentUploadUtility()
         {
+            throw new NotImplementedException("Cannot use default constructor");
         }
 
         /// <summary>
@@ -34,17 +33,16 @@ namespace PhotoStoragePOC.DocumentUpload.S3
         {
             BucketName = bucketName;
 
-            AWSCredentials credentials = BuildCredentials(key, secret);
-            GetSessionToken(credentials);
+            StsUtility stsUtility = new StsUtility();
+            Credentials credentials = stsUtility.GetSessionToken(key, secret);
+
+            AccessKey = credentials.AccessKeyId;
+            SecretKey = credentials.SecretAccessKey;
+            SessionToken = credentials.SessionToken;
+
+            //AWSCredentials credentials = BuildCredentials(key, secret);
+            //GetSessionToken(credentials);
         }
-
-        public DocumentUploadUtility(AWSCredentials credentials, string bucketName)
-        {
-            GetSessionToken(credentials);
-
-            BucketName = bucketName;
-        }
-
 
         #region Public Methods
 
@@ -86,52 +84,6 @@ namespace PhotoStoragePOC.DocumentUpload.S3
         #endregion
 
         #region Private Methods
-
-        private void GetSessionToken(AWSCredentials credentials)
-        {
-            using (var stsClient = new AmazonSecurityTokenServiceClient(credentials))
-            {                
-                try
-                {
-                    var getSessionTokenRequest = new GetSessionTokenRequest()
-                    {
-                        DurationSeconds = 7200
-                    };
-
-                    GetSessionTokenResponse response = stsClient.GetSessionToken(getSessionTokenRequest);
-
-                    Credentials sessionCredentials = response.Credentials;
-
-                    AccessKey = sessionCredentials.AccessKeyId;
-                    SecretKey = sessionCredentials.SecretAccessKey;
-                    SessionToken = sessionCredentials.SessionToken;
-                }
-                catch (System.Exception ex)
-                {
-                    throw ex;
-                }                
-            }
-        }
-
-        private AWSCredentials BuildCredentials(string accessKey, string secretKey)
-        {
-            AWSCredentials credentials = null;
-
-            var options = new CredentialProfileOptions()
-            {
-                AccessKey = accessKey,
-                SecretKey = secretKey
-            };
-
-            CredentialProfile profile = new CredentialProfile("default", options);
-            profile.Region = RegionEndpoint.USEast1;
-            var sharedFile = new SharedCredentialsFile();
-            sharedFile.RegisterProfile(profile);
-
-            AWSCredentialsFactory.TryGetAWSCredentials(profile, sharedFile, out credentials);
-
-            return credentials;
-        }
 
         #endregion
     }
