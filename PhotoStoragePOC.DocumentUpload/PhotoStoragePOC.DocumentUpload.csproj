@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\DocumentEntity.cs" />
+    <Compile Include="Entities\TestDocumentEntity.cs" />
     <Compile Include="Entities\UploadStatusEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="S3\DocumentUploadUtility.cs" />
