@@ -19,29 +19,34 @@ namespace PhotoStoragePOC.ConsoleTests
 {
     public class Program
     {
+        private static string AccessKey = "";
+        private static string SecretKey = "";
+        private static string DefaultBucket = "photostoragepoc";
+        private static string TestUser = "testuser";
+
         public static void Main(string[] args)
         {
+            string filename;
+
             WriteStartHeader();
             TestStsUtility();
-            VerifyBucketUpload();
+            filename = VerifyBucketUpload();
+            TestListS3Objects();
+            TestGetS3Object(filename);
+            TestDeleteS3Object(filename);
 
             Console.Read();
         }
 
-        private static void VerifyBucketUpload()
+        private static string VerifyBucketUpload()
         {
             Console.WriteLine("========================================================");
             Console.WriteLine("| Testing S3 File Upload                               |");
             Console.WriteLine("========================================================");
 
-            // Set some defaults
-            string defaultBucket = "photostoragepoc";
-            // AWSCredentials credentials = BuildCredentials();
-
             // Create new utility instance
-            DocumentUploadUtility utility = new DocumentUploadUtility(defaultBucket, "", "");
-
-
+            DocumentUploadUtility utility = new DocumentUploadUtility(DefaultBucket, AccessKey, SecretKey);
+            
             // Build file stream
             string fileName = "test" + DateTime.Now.ToFileTime().ToString() + ".txt";
             FileStream stream = File.Create(fileName);
@@ -52,7 +57,7 @@ namespace PhotoStoragePOC.ConsoleTests
             try
             {
                 // Test file upload
-                utility.UploadDocumentToS3(stream, fileName, "testuser");
+                utility.UploadDocumentToS3(stream, fileName, TestUser);
             }
             catch (Exception ex)
             {
@@ -60,6 +65,10 @@ namespace PhotoStoragePOC.ConsoleTests
                 Console.WriteLine("Message: " + ex.Message);
                 Console.WriteLine("StackTrace:\n" + ex.StackTrace);
             }
+
+            Console.WriteLine();
+
+            return fileName;
         }
 
         private static void TestStsUtility()
@@ -72,7 +81,7 @@ namespace PhotoStoragePOC.ConsoleTests
             try
             {
                 StsUtility stsUtility = new StsUtility();
-                Credentials credentials = stsUtility.GetSessionToken("", "");
+                Credentials credentials = stsUtility.GetSessionToken(AccessKey, SecretKey);
 
                 Console.WriteLine("Temporary Credentials were located ...");
                 Console.WriteLine("Session Access Key: " + credentials.AccessKeyId);
@@ -85,7 +94,94 @@ namespace PhotoStoragePOC.ConsoleTests
                 Console.WriteLine("Message: " + ex.Message);
                 Console.WriteLine("StackTrace:\n" + ex.StackTrace);
             }
-            
+
+            Console.WriteLine();
+        }
+
+        private static void TestListS3Objects()
+        {
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing S3 File List                                  |");
+            Console.WriteLine("========================================================");
+
+            // Create new utility instance
+            DocumentUploadUtility utility = new DocumentUploadUtility(DefaultBucket, AccessKey, SecretKey);
+
+            try
+            {
+                // Get List of Objects
+                List<DocumentEntity> documents = utility.ListDocuments(TestUser);
+
+                foreach(DocumentEntity document in documents)
+                {
+                    Console.WriteLine(String.Format("Document found... Document Owner: {0}  Key: {1}", document.DocumentOwner, document.FileName));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+
+            Console.WriteLine();
+        }
+
+        private static void TestGetS3Object(string fileName)
+        {
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing Get S3 File                                  |");
+            Console.WriteLine("========================================================");
+
+            // Create new utility instance
+            DocumentUploadUtility utility = new DocumentUploadUtility(DefaultBucket, AccessKey, SecretKey);
+
+            try
+            {
+                TestDocumentEntity document = utility.GetTestDocument(TestUser, fileName, DefaultBucket);
+
+                Console.WriteLine("Document found ...");
+                Console.WriteLine("File Name: " + document.FileName);
+                Console.WriteLine("Owner: " + document.Owner);
+                Console.WriteLine("File contents:");
+                Console.WriteLine(document.Contents);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+
+            Console.WriteLine();
+        }
+
+        private static void TestDeleteS3Object(string fileName)
+        {
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing Get S3 File                                  |");
+            Console.WriteLine("========================================================");
+
+            // Create new utility instance
+            DocumentUploadUtility utility = new DocumentUploadUtility(DefaultBucket, AccessKey, SecretKey);
+
+            try
+            {
+                bool status = utility.DeleteS3Object(fileName, TestUser, DefaultBucket);
+
+                if (status)
+                    Console.WriteLine("Successfully deleted " + fileName);
+                else
+                    Console.WriteLine("Failed to delete " + fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+
+            Console.WriteLine();
         }
 
         private static void WriteStartHeader()
