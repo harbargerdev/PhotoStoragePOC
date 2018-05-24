@@ -6,6 +6,8 @@ using Amazon.SecurityToken.Model;
 using Amazon;
 using PhotoStoragePOC.DocumentUpload.STS;
 using System;
+using System.Collections.Generic;
+using System.Net;
 
 namespace PhotoStoragePOC.DocumentUpload.S3
 {
@@ -39,9 +41,6 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             AccessKey = credentials.AccessKeyId;
             SecretKey = credentials.SecretAccessKey;
             SessionToken = credentials.SessionToken;
-
-            //AWSCredentials credentials = BuildCredentials(key, secret);
-            //GetSessionToken(credentials);
         }
 
         #region Public Methods
@@ -81,9 +80,130 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             return uploadStatus;
         }
 
+        public List<DocumentEntity> ListDocuments(string userId)
+        {
+            List<DocumentEntity> documents = new List<DocumentEntity>();
+
+            SetS3Client();
+
+            ListObjectsV2Request request = new ListObjectsV2Request()
+            {
+                BucketName = this.BucketName,
+                Prefix = userId
+            };
+
+            try
+            {
+                ListObjectsV2Response response = s3Client.ListObjectsV2(request);
+
+                if(response.S3Objects.Count > 0)
+                {
+                    foreach(S3Object s3object in response.S3Objects)
+                    {
+                        documents.Add(ConvertS3ObjectToDocumentEntity(s3object));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return documents;
+        }
+
+        public TestDocumentEntity GetTestDocument(string userId, string fileName, string bucketName)
+        {
+            TestDocumentEntity document = null;
+
+            SetS3Client();
+
+            GetObjectRequest request = new GetObjectRequest()
+            {
+                Key = userId + '/' + fileName,
+                BucketName = bucketName                
+            };
+
+            try
+            {
+                GetObjectResponse response = s3Client.GetObject(request);
+
+                if(response.HttpStatusCode.Equals(HttpStatusCode.OK))
+                {
+                    document = new TestDocumentEntity();
+
+                    string[] split_key = response.Key.Split('/');
+                    document.Owner = split_key[0];
+                    document.FileName = split_key[1];
+
+                    using (StreamReader reader = new StreamReader(response.ResponseStream))
+                    {
+                        document.Contents = reader.ReadToEnd();
+                    }
+
+                    //FileStream copy = File.Create("~/" + response.Key);
+                    //response.WriteResponseStreamToFile(copy.Name, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }            
+
+            return document;
+        }
+
+        public bool DeleteS3Object(string fileName, string userId, string bucketName)
+        {
+            bool status = false;
+
+            SetS3Client();
+
+            DeleteObjectRequest request = new DeleteObjectRequest()
+            {
+                BucketName = bucketName,
+                Key = userId + "/" + fileName
+            };
+
+            try
+            {
+                DeleteObjectResponse response = s3Client.DeleteObject(request);
+
+                status = !response.ResponseMetadata.RequestId.Equals(String.Empty);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return status;
+        }
+
         #endregion
 
         #region Private Methods
+
+        private DocumentEntity ConvertS3ObjectToDocumentEntity(S3Object s3Object)
+        {
+            DocumentEntity document = new DocumentEntity();
+
+            document.CreateDate = s3Object.LastModified;
+            string[] owner_key = s3Object.Key.Split('/');
+            document.DocumentOwner = owner_key[0];
+            document.FileName = owner_key[1];
+            
+            return document;
+        }
+
+        private void SetS3Client()
+        {
+            if(s3Client == null)
+            {
+                AmazonS3Config config = new AmazonS3Config() { RegionEndpoint = RegionEndpoint.USEast1 };
+
+                s3Client = new AmazonS3Client(AccessKey, SecretKey, SessionToken, config);
+            }
+        }
 
         #endregion
     }
