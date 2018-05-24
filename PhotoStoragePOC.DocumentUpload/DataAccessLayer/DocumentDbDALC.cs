@@ -50,7 +50,7 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
 
             try
             {
-                
+                entity.ID = (entity.DocumentOwner + entity.FileName).GetHashCode();
                 context.Save<DocumentEntity>(entity);
             }
             catch (Exception ex)
@@ -62,9 +62,7 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
         }
 
         #endregion
-
-
-
+        
         #region Private Methods
 
         private void SetDynamoDBClient()
@@ -76,21 +74,7 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
                 DynamoClient = new AmazonDynamoDBClient(AccessKey, SecretKey, SessionToken, config);
             }
         }
-         
-        private int GetMaxHasKey()
-        {
-            Select select = new Select("");
-
-            ScanRequest request = new ScanRequest()
-            {
-                AttributesToGet = new List<string>() { "ID" },
-                TableName = DEFAULT_TABLE_NAME,
-                
-            };
-
-            return 0;
-        }
-
+        
         #endregion
     }
 }
