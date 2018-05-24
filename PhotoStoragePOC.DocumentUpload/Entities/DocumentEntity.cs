@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Amazon.DynamoDBv2.DataModel;
+using System;
 
 namespace PhotoStoragePOC.DocumentUpload.Entities
 {
+    [DynamoDBTable("photostoragepoc")]
     public class DocumentEntity
     {
+        [DynamoDBHashKey]
         public long ID { get; set; }
         public string DocumentOwner { get; set; }
         public DateTime CreateDate { get; set; }

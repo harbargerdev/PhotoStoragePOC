@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccessLayer\DocumentDbDALC.cs" />
     <Compile Include="Entities\DocumentEntity.cs" />
     <Compile Include="Entities\TestDocumentEntity.cs" />
     <Compile Include="Entities\UploadStatusEntity.cs" />
@@ -67,8 +68,6 @@
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.18.2\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SecurityToken.3.3.4.3\analyzers\dotnet\cs\AWSSDK.SecurityToken.CodeAnalysis.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DataAccessLayer\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

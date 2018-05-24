@@ -8,6 +8,7 @@ using PhotoStoragePOC.DocumentUpload.STS;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using PhotoStoragePOC.DocumentUpload.DataAccessLayer;
 
 namespace PhotoStoragePOC.DocumentUpload.S3
 {
@@ -67,12 +68,24 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             {
                 PutObjectResponse response = s3Client.PutObject(request);
 
-                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                if (response.HttpStatusCode == HttpStatusCode.OK)
                 {
                     uploadStatus.IsSuccess = true;
+                    DocumentEntity entity = new DocumentEntity()
+                    {
+                        DocumentOwner = userId,
+                        FileName = fileName,
+                        CreateDate = DateTime.Now,
+                        LastUpdateDate = DateTime.Now,
+                        Url = "https://s3.amazonaws.com/" + BucketName + "/" + userId + "/" + fileName
+                    };
+
+                    DocumentDbDALC documentDb = new DocumentDbDALC(AccessKey, SecretKey, SessionToken);
+
+                    documentDb.InsertDocumentRecord(entity);
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
