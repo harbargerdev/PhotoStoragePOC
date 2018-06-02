@@ -33,11 +33,38 @@ namespace PhotoStoragePOC.DocumentUpload
 
         public DocumentEntity UploadDocument(string filename, string extension, Stream filestream)
         {
+            // Try to retrieve existing file
+            DocumentEntity document = documentDb.GetDocumentRecord(User.UserName, filename);
+
+            // If Exists
+            if(document != null)
+            {
+                var status = documentUploadUtility.UploadDocumentToS3(filestream, filename, User.UserName);
+
+                if(status.IsSuccess)
+                {
+                    document.LastUpdateDate = DateTime.Now;
+
+                    documentDb.UpdateDocumentRecord(document);
+                }
+            }
+            else
+            {
+                document = UploadNewDocument(filename, extension, filestream);
+            }
+
+            return document;
+        }
+
+        #region Private Methods
+
+        private DocumentEntity UploadNewDocument(string filename, string extension, Stream filestream)
+        {
             DocumentEntity document = null;
 
             var status = documentUploadUtility.UploadDocumentToS3(filestream, filename, User.UserName);
 
-            if(status.IsSuccess)
+            if (status.IsSuccess)
             {
                 document = status.Document;
                 document.CreateDate = DateTime.Now;
@@ -49,5 +76,7 @@ namespace PhotoStoragePOC.DocumentUpload
 
             return document;
         }
+
+        #endregion
     }
 }
