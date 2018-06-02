@@ -46,7 +46,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
 
         #region Public Methods
 
-        public UploadStatusEntity UploadDocumentToS3(FileStream stream, string fileName, string userId)
+        public UploadStatusEntity UploadDocumentToS3(Stream stream, string fileName, string userId)
         {
             UploadStatusEntity uploadStatus = new UploadStatusEntity();
 
@@ -61,7 +61,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             {
                 BucketName = BucketName,
                 Key = userId + '/' + fileName,
-                InputStream = stream
+                InputStream = stream                
             };
 
             try
@@ -80,9 +80,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
                         Url = "https://s3.amazonaws.com/" + BucketName + "/" + userId + "/" + fileName
                     };
 
-                    DocumentDbDALC documentDb = new DocumentDbDALC(AccessKey, SecretKey, SessionToken);
-
-                    documentDb.InsertDocumentRecord(entity);
+                    uploadStatus.Document = entity;
                 }
             }
             catch (Exception ex)

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.DocumentModel;
 
 namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
 {
@@ -57,6 +58,49 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
             {
                 throw ex;
             }            
+
+            return entity;
+        }
+
+        public DocumentEntity UpdateDocumentRecord(DocumentEntity entity)
+        {
+            SetDynamoDBClient();
+
+            DynamoDBContext context = new DynamoDBContext(DynamoClient);
+
+            try
+            {
+                context.Save<DocumentEntity>(entity);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return entity;
+        }
+
+        public DocumentEntity GetDocumentRecord(string userId, string fileName)
+        {
+            DocumentEntity entity = null;
+
+            SetDynamoDBClient();
+
+            DynamoDBContext context = new DynamoDBContext(DynamoClient);
+
+            try
+            {
+                string hashKey = (userId + fileName).GetHashCode().ToString();
+
+                List<DocumentEntity> entities = context.Query<DocumentEntity>(hashKey).ToList<DocumentEntity>();
+
+                if (entities.Count > 0)
+                    entity = entities.FirstOrDefault<DocumentEntity>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
 
             return entity;
         }
