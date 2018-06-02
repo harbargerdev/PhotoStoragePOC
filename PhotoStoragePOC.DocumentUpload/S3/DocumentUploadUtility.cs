@@ -89,7 +89,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             return uploadStatus;
         }
 
-        public List<DocumentEntity> ListDocuments(string userId)
+        public List<DocumentEntity> ListDocuments(string username)
         {
             List<DocumentEntity> documents = new List<DocumentEntity>();
 
@@ -98,7 +98,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             ListObjectsV2Request request = new ListObjectsV2Request()
             {
                 BucketName = this.BucketName,
-                Prefix = userId
+                Prefix = username
             };
 
             try
@@ -121,7 +121,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             return documents;
         }
 
-        public TestDocumentEntity GetTestDocument(string userId, string fileName, string bucketName)
+        public TestDocumentEntity GetTestDocument(string username, string fileName, string bucketName)
         {
             TestDocumentEntity document = null;
 
@@ -129,7 +129,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
 
             GetObjectRequest request = new GetObjectRequest()
             {
-                Key = userId + '/' + fileName,
+                Key = username + '/' + fileName,
                 BucketName = bucketName                
             };
 
@@ -159,7 +159,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             return document;
         }
 
-        public bool DeleteS3Object(string fileName, string userId, string bucketName)
+        public bool DeleteS3Object(string fileName, string username, string bucketName)
         {
             bool status = false;
 
@@ -168,7 +168,7 @@ namespace PhotoStoragePOC.DocumentUpload.S3
             DeleteObjectRequest request = new DeleteObjectRequest()
             {
                 BucketName = bucketName,
-                Key = userId + "/" + fileName
+                Key = username + "/" + fileName
             };
 
             try

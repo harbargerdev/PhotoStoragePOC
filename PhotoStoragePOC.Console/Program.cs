@@ -35,7 +35,6 @@ namespace PhotoStoragePOC.ConsoleTests
             WriteStartHeader();
 
             // Tests
-            // TestStsUtility();
             filename = VerifyBucketUpload();
             TestListS3Objects();
             TestGetS3Object(filename);
@@ -226,11 +225,12 @@ namespace PhotoStoragePOC.ConsoleTests
             Console.WriteLine("========================================================");
 
             // Create new utility instance
-            DocumentUploadUtility utility = new DocumentUploadUtility(DefaultBucket, AccessKey, SecretKey);
+            DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
 
             try
             {
-                bool status = utility.DeleteS3Object(fileName, TestUser, DefaultBucket);
+                //bool status = utility.DeleteS3Object(fileName, TestUser, DefaultBucket);
+                bool status = processor.DeleteDocument(fileName, DefaultBucket);
 
                 if (status)
                     Console.WriteLine("Successfully deleted " + fileName);
