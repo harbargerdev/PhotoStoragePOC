@@ -10,11 +10,11 @@ using Amazon.IdentityManagement;
 using Amazon;
 using Amazon.IdentityManagement.Model;
 using PhotoStoragePOC.DocumentUpload.Entities;
-using PhotoStoragePOC.DocumentUpload.S3;
 using System.IO;
 using PhotoStoragePOC.DocumentUpload.STS;
 using Amazon.SecurityToken.Model;
 using PhotoStoragePOC.DocumentUpload;
+using PhotoStoragePOC.DocumentUpload.S3;
 
 namespace PhotoStoragePOC.ConsoleTests
 {
