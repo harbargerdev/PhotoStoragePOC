@@ -56,38 +56,36 @@ namespace PhotoStoragePOC.ConsoleTests
             
             // Build file stream
             string fileName = "test" + DateTime.Now.ToFileTime().ToString() + ".txt";
-            FileStream stream = File.Create(fileName);
-            string testMessage = "This is a test message created " + DateTime.Now.ToFileTime().ToString();
-            //byte[] bytes = Encoding.ASCII.GetBytes(testMessage);
-            stream.BeginWrite(Encoding.ASCII.GetBytes(testMessage), 0, Encoding.ASCII.GetByteCount(testMessage), null, null);
-
-
-            // Switching to Document Processor
-            DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
-
-            try
+            using(FileStream stream = File.Create(fileName))
             {
-                // Test file upload
-                //utility.UploadDocumentToS3(stream, fileName, TestUser);
-                DocumentEntity document = processor.UploadDocument(fileName, "txt", stream);
+                string testMessage = "This is a test message created " + DateTime.Now.ToFileTime().ToString();
+                stream.BeginWrite(Encoding.ASCII.GetBytes(testMessage), 0, Encoding.ASCII.GetByteCount(testMessage), null, null);
 
-                if(document.Url != null && !document.Url.Equals(string.Empty))
+
+                // Switching to Document Processor
+                DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
+
+                try
                 {
-                    Console.WriteLine("Document successfully uploaded.");
-                    Console.WriteLine("Url: " + document.Url);
+                    // Test file upload
+                    DocumentEntity document = processor.UploadDocument(fileName, "txt", stream);
+
+                    if (document.Url != null && !document.Url.Equals(string.Empty))
+                    {
+                        Console.WriteLine("Document successfully uploaded.");
+                        Console.WriteLine("Url: " + document.Url);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occured ...");
+                    Console.WriteLine("Message: " + ex.Message);
+                    Console.WriteLine("StackTrace:\n" + ex.StackTrace);
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine("An error occured ...");
-                Console.WriteLine("Message: " + ex.Message);
-                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
-            }
-
             Console.WriteLine();
 
             // Clean Up Test File
-            stream.Close();
             File.Delete(fileName);
 
             return fileName;
