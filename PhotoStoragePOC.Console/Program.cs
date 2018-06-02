@@ -203,8 +203,8 @@ namespace PhotoStoragePOC.ConsoleTests
                 {
                     Console.WriteLine("Successfully updated file in S3: ");
                     Console.WriteLine("Document Name: " + entity.FileName);
-                    Console.WriteLine("Document Created: " + entity.CreateDate.ToLongDateString());
-                    Console.WriteLine("Document Last Updated: " + entity.LastUpdateDate.ToLongDateString());
+                    Console.WriteLine("Document Created: " + entity.CreateDate.ToString());
+                    Console.WriteLine("Document Last Updated: " + entity.LastUpdateDate.ToString());
                 }
             }
             catch (Exception ex)
