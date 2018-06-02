@@ -188,15 +188,18 @@ namespace PhotoStoragePOC.ConsoleTests
             try
             {
                 TestDocumentEntity document = utility.GetTestDocument(TestUser, filename, DefaultBucket);
+                DocumentEntity entity = null;
 
-                FileStream stream = File.Create(filename);
-                string newLine = "\nThis is a new line for update " + DateTime.Now.ToString();
-                stream.BeginWrite(Encoding.ASCII.GetBytes(document.Contents + newLine), 0, Encoding.ASCII.GetByteCount(document.Contents + newLine), null, null);
+                using (FileStream stream = File.Create(filename))
+                {
+                    string newLine = "\nThis is a new line for update " + DateTime.Now.ToString();
+                    stream.BeginWrite(Encoding.ASCII.GetBytes(document.Contents + newLine), 0, Encoding.ASCII.GetByteCount(document.Contents + newLine), null, null);
 
-                DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
-                DocumentEntity entity = processor.UploadDocument(filename, "txt", stream);
+                    DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
+                    entity = processor.UploadDocument(filename, "txt", stream);
+                }
 
-                if(entity != null)
+                if (entity != null)
                 {
                     Console.WriteLine("Successfully updated file in S3: ");
                     Console.WriteLine("Document Name: " + entity.FileName);
