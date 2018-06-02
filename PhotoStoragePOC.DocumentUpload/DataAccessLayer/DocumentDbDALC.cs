@@ -130,6 +130,26 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
             return entity;
         }
 
+        public bool DeleteDocumentRecord(DocumentEntity document)
+        {
+            bool status = true;
+
+            SetDynamoDBClient();
+
+            DynamoDBContext context = new DynamoDBContext(DynamoClient);
+
+            try
+            {
+                context.Delete<DocumentEntity>(document);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return status;
+        }
+
         #endregion
         
         #region Private Methods

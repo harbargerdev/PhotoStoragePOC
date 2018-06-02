@@ -55,6 +55,27 @@ namespace PhotoStoragePOC.DocumentUpload
             return document;
         }
 
+        public bool DeleteDocument(string filename, string bucketname)
+        {
+            bool status = false;
+
+            // Retrieve Document Record
+            DocumentEntity document = documentDb.GetDocumentRecord(User.UserName, filename);
+
+            try
+            {
+                status = documentUploadUtility.DeleteS3Object(filename, User.UserName, bucketname);
+
+                status = status ? documentDb.DeleteDocumentRecord(document) : status;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return status;
+        }
+
         #region Private Methods
 
         private DocumentEntity UploadNewDocument(string filename, string extension, Stream filestream)
