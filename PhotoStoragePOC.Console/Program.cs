@@ -39,6 +39,7 @@ namespace PhotoStoragePOC.ConsoleTests
             filename = VerifyBucketUpload();
             TestListS3Objects();
             TestGetS3Object(filename);
+            TestUpdateS3Object(filename);
             TestDeleteS3Object(filename);
 
             Console.Read();
@@ -57,7 +58,7 @@ namespace PhotoStoragePOC.ConsoleTests
             string fileName = "test" + DateTime.Now.ToFileTime().ToString() + ".txt";
             FileStream stream = File.Create(fileName);
             string testMessage = "This is a test message created " + DateTime.Now.ToFileTime().ToString();
-            byte[] bytes = Encoding.ASCII.GetBytes(testMessage);
+            //byte[] bytes = Encoding.ASCII.GetBytes(testMessage);
             stream.BeginWrite(Encoding.ASCII.GetBytes(testMessage), 0, Encoding.ASCII.GetByteCount(testMessage), null, null);
 
 
@@ -86,6 +87,7 @@ namespace PhotoStoragePOC.ConsoleTests
             Console.WriteLine();
 
             // Clean Up Test File
+            stream.Close();
             File.Delete(fileName);
 
             return fileName;
@@ -172,6 +174,46 @@ namespace PhotoStoragePOC.ConsoleTests
                 Console.WriteLine("Message: " + ex.Message);
                 Console.WriteLine("StackTrace:\n" + ex.StackTrace);
             }
+
+            Console.WriteLine();
+        }
+
+        private static void TestUpdateS3Object(string filename)
+        {
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing Update S3 File                               |");
+            Console.WriteLine("========================================================");
+
+            // Create new utility instance
+            DocumentUploadUtility utility = new DocumentUploadUtility(DefaultBucket, AccessKey, SecretKey);
+
+            try
+            {
+                TestDocumentEntity document = utility.GetTestDocument(TestUser, filename, DefaultBucket);
+
+                FileStream stream = File.Create(filename);
+                string newLine = "\nThis is a new line for update " + DateTime.Now.ToString();
+                stream.BeginWrite(Encoding.ASCII.GetBytes(document.Contents + newLine), 0, Encoding.ASCII.GetByteCount(document.Contents + newLine), null, null);
+
+                DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
+                DocumentEntity entity = processor.UploadDocument(filename, "txt", stream);
+
+                if(entity != null)
+                {
+                    Console.WriteLine("Successfully updated file in S3: ");
+                    Console.WriteLine("Document Name: " + entity.FileName);
+                    Console.WriteLine("Document Created: " + entity.CreateDate.ToLongDateString());
+                    Console.WriteLine("Document Last Updated: " + entity.LastUpdateDate.ToLongDateString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+
+            File.Delete(filename);
 
             Console.WriteLine();
         }
