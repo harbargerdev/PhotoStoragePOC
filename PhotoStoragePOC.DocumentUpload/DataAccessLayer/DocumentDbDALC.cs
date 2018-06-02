@@ -11,6 +11,7 @@ using Amazon;
 using Amazon.DynamoDBv2.Model;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
+using Newtonsoft.Json;
 
 namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
 {
@@ -90,9 +91,33 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
 
             try
             {
-                string hashKey = (username + fileName).GetHashCode().ToString();
+                Table table = Table.LoadTable(DynamoClient, DEFAULT_TABLE_NAME);
 
-                List<DocumentEntity> entities = context.Query<DocumentEntity>(hashKey).ToList<DocumentEntity>();
+                int hashKey = (username + fileName).GetHashCode();
+                QueryFilter filter = new QueryFilter("ID", QueryOperator.Equal, hashKey);
+
+                QueryOperationConfig queryConfig = new QueryOperationConfig()
+                {
+                    Limit = 1,
+                    Select = SelectValues.AllAttributes,
+                    Filter = filter
+                };
+
+                Search search = table.Query(queryConfig);
+
+                List<Document> documents = new List<Document>();
+                List<DocumentEntity> entities = new List<DocumentEntity>();
+
+                do
+                {
+                    documents = search.GetNextSet();
+                    foreach(var document in documents)
+                    {
+                        string json = document.ToJson();
+                        DocumentEntity newEntity = JsonConvert.DeserializeObject<DocumentEntity>(json);
+                        entities.Add(newEntity);
+                    }
+                } while (!search.IsDone);
 
                 if (entities.Count > 0)
                     entity = entities.FirstOrDefault<DocumentEntity>();
