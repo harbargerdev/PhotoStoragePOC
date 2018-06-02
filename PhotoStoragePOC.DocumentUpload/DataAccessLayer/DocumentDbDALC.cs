@@ -80,7 +80,7 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
             return entity;
         }
 
-        public DocumentEntity GetDocumentRecord(string userId, string fileName)
+        public DocumentEntity GetDocumentRecord(string username, string fileName)
         {
             DocumentEntity entity = null;
 
@@ -90,7 +90,7 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
 
             try
             {
-                string hashKey = (userId + fileName).GetHashCode().ToString();
+                string hashKey = (username + fileName).GetHashCode().ToString();
 
                 List<DocumentEntity> entities = context.Query<DocumentEntity>(hashKey).ToList<DocumentEntity>();
 
