@@ -11,6 +11,7 @@ namespace PhotoStoragePOC.DocumentUpload.Entities
         public bool IsSuccess { get; set; } 
         public string ErrorMessage { get; set; }
         public string DocumentUrl { get; set; }
+        public DocumentEntity Document { get; set; }
 
         public UploadStatusEntity()
         {

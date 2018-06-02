@@ -53,9 +53,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccessLayer\DocumentDbDALC.cs" />
+    <Compile Include="DocumentProcessor.cs" />
     <Compile Include="Entities\DocumentEntity.cs" />
     <Compile Include="Entities\TestDocumentEntity.cs" />
     <Compile Include="Entities\UploadStatusEntity.cs" />
+    <Compile Include="Entities\UserEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="S3\DocumentUploadUtility.cs" />
     <Compile Include="STS\StsUtility.cs" />
