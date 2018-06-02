@@ -151,9 +151,6 @@ namespace PhotoStoragePOC.DocumentUpload.S3
                     {
                         document.Contents = reader.ReadToEnd();
                     }
-
-                    //FileStream copy = File.Create("~/" + response.Key);
-                    //response.WriteResponseStreamToFile(copy.Name, false);
                 }
             }
             catch (Exception ex)
