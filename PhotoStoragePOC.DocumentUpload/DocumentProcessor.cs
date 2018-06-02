@@ -44,7 +44,6 @@ namespace PhotoStoragePOC.DocumentUpload
                 if(status.IsSuccess)
                 {
                     document.LastUpdateDate = DateTime.Now;
-
                     documentDb.UpdateDocumentRecord(document);
                 }
             }

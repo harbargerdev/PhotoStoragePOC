@@ -75,8 +75,6 @@ namespace PhotoStoragePOC.DocumentUpload.S3
                     {
                         DocumentOwner = userId,
                         FileName = fileName,
-                        CreateDate = DateTime.Now,
-                        LastUpdateDate = DateTime.Now,
                         Url = "https://s3.amazonaws.com/" + BucketName + "/" + userId + "/" + fileName
                     };
 
