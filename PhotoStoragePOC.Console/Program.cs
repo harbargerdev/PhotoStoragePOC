@@ -14,6 +14,7 @@ using PhotoStoragePOC.DocumentUpload.S3;
 using System.IO;
 using PhotoStoragePOC.DocumentUpload.STS;
 using Amazon.SecurityToken.Model;
+using PhotoStoragePOC.DocumentUpload;
 
 namespace PhotoStoragePOC.ConsoleTests
 {
@@ -23,13 +24,18 @@ namespace PhotoStoragePOC.ConsoleTests
         private static string SecretKey = "";
         private static string DefaultBucket = "photostoragepoc";
         private static string TestUser = "testuser";
+        private static UserEntity User;
 
         public static void Main(string[] args)
         {
             string filename;
 
+            // Prep Tests
+            CreateTestUser();
             WriteStartHeader();
-            TestStsUtility();
+
+            // Tests
+            // TestStsUtility();
             filename = VerifyBucketUpload();
             TestListS3Objects();
             TestGetS3Object(filename);
@@ -54,10 +60,21 @@ namespace PhotoStoragePOC.ConsoleTests
             byte[] bytes = Encoding.ASCII.GetBytes(testMessage);
             stream.BeginWrite(Encoding.ASCII.GetBytes(testMessage), 0, Encoding.ASCII.GetByteCount(testMessage), null, null);
 
+
+            // Switching to Document Processor
+            DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
+
             try
             {
                 // Test file upload
-                utility.UploadDocumentToS3(stream, fileName, TestUser);
+                //utility.UploadDocumentToS3(stream, fileName, TestUser);
+                DocumentEntity document = processor.UploadDocument(fileName, "txt", stream);
+
+                if(document.Url != null && !document.Url.Equals(string.Empty))
+                {
+                    Console.WriteLine("Document successfully uploaded.");
+                    Console.WriteLine("Url: " + document.Url);
+                }
             }
             catch (Exception ex)
             {
@@ -67,6 +84,9 @@ namespace PhotoStoragePOC.ConsoleTests
             }
 
             Console.WriteLine();
+
+            // Clean Up Test File
+            File.Delete(fileName);
 
             return fileName;
         }
@@ -190,6 +210,19 @@ namespace PhotoStoragePOC.ConsoleTests
             Console.WriteLine("| PhotoStoragePoc Console Tests                          |");
             Console.WriteLine("==========================================================");
             Console.WriteLine("\n");
+        }
+
+        private static void CreateTestUser()
+        {
+            User = new UserEntity()
+            {
+                UserName = "testuser",
+                Id = 1,
+                FirstName = "Test",
+                LastName = "User",
+                Email = "fubar@email.org"
+            };
+
         }
     }
 }
