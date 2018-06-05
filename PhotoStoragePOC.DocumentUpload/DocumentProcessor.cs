@@ -76,6 +76,11 @@ namespace PhotoStoragePOC.DocumentUpload
             return status;
         }
 
+        public List<DocumentEntity> GetDocumentsForUser()
+        {
+            return documentDb.GetAllUserDocuments(User.UserName);
+        }
+
         #region Private Methods
 
         private DocumentEntity UploadNewDocument(string filename, string extension, Stream filestream)

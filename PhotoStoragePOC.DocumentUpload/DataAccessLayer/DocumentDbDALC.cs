@@ -150,6 +150,43 @@ namespace PhotoStoragePOC.DocumentUpload.DataAccessLayer
             return status;
         }
 
+        public List<DocumentEntity> GetAllUserDocuments(string username)
+        {
+            List<DocumentEntity> documents = null;
+
+            SetDynamoDBClient();
+
+            try
+            {
+                DynamoDBContext context = new DynamoDBContext(DynamoClient);
+
+                //List<QueryFilter> query = new List<QueryFilter>() { new QueryFilter("", QueryOperator.Equal, username) };
+                List<ScanCondition> conditions = new List<ScanCondition>() { new ScanCondition("DocumentOwner", ScanOperator.Equal, username) };
+
+
+                DynamoDBOperationConfig operation = new DynamoDBOperationConfig()
+                {
+                    IndexName = "DocumentOwner-index",
+                    QueryFilter = conditions
+                };
+
+                BatchGet<DocumentEntity> results = context.CreateBatchGet<DocumentEntity>(operation);
+                results.Execute();
+
+                if(results.Results != null && results.Results.Count > 0)
+                {
+                    foreach (DocumentEntity document in results.Results)
+                        documents.Add(document);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return documents;
+        }
+
         #endregion
         
         #region Private Methods
