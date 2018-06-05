@@ -37,6 +37,7 @@ namespace PhotoStoragePOC.ConsoleTests
             // Tests
             filename = VerifyBucketUpload();
             TestListS3Objects();
+            TestGetDocumentsByUser();
             TestGetS3Object(filename);
             TestUpdateS3Object(filename);
             TestDeleteS3Object(filename);
@@ -236,6 +237,41 @@ namespace PhotoStoragePOC.ConsoleTests
                     Console.WriteLine("Successfully deleted " + fileName);
                 else
                     Console.WriteLine("Failed to delete " + fileName);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occured ...");
+                Console.WriteLine("Message: " + ex.Message);
+                Console.WriteLine("StackTrace:\n" + ex.StackTrace);
+            }
+
+            Console.WriteLine();
+        }
+
+        private static void TestGetDocumentsByUser()
+        {
+            Console.WriteLine("========================================================");
+            Console.WriteLine("| Testing Get DynamoDB File Listings                   |");
+            Console.WriteLine("========================================================");
+
+            // Create new utility instance
+            DocumentProcessor processor = new DocumentProcessor(User, DefaultBucket, AccessKey, SecretKey);
+
+            try
+            {
+                List<DocumentEntity> documents = processor.GetDocumentsForUser();
+
+                if (documents != null)
+                {
+                    foreach (DocumentEntity document in documents)
+                    {
+                        Console.WriteLine("Document found with ID: " + document.ID, " Filename:  " + document.FileName + " Created Date: " + document.CreateDate);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Something happened in getting all items from DynamoDB");
+                }
             }
             catch (Exception ex)
             {
